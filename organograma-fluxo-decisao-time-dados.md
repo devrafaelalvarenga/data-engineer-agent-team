@@ -29,7 +29,8 @@ graph TD
     STK -->|"backlog, prioridades,<br/>status, incidentes"| NEXUS
 
     SCOPE["🔍 Scope<br/>Analista de Requisitos<br/><i>entrevista em rodadas → brief funcional</i>"]
-    SCOPE -->|"brief validado<br/>pelo stakeholder"| NEXUS
+    SCOPE -->|"brief VALIDADO<br/>(stakeholder, sem dúvidas)"| NEXUS
+    NEXUS -.->|"questionamento<br/>(brief PENDENTE)"| SCOPE
     AXIS -.->|"dúvida de informação<br/>ou brief inviável"| SCOPE
 
     NEXUS["🧑‍💼 Nexus<br/>Gestor / Líder Técnico<br/><i>gestão, priorização, cobrança</i>"]
@@ -121,7 +122,7 @@ graph TD
 ## 3. Papel de Cada Agente no Fluxo de Decisão
 
 - **Scope (Analista de Requisitos)** é a **porta de entrada de projetos novos e ideias vagas**, pensada para stakeholders sem conhecimento técnico. Conduz a entrevista em rodadas (máx. 3, ~5 perguntas cada, mediadas pela conversa principal, pois subagentes não conversam com o usuário no meio da execução) e entrega um **brief funcional** que o stakeholder valida antes de seguir. Não decide tecnologia nem arquitetura.
-- **Nexus (Gestor)** é a **porta de entrada de backlog, priorização, status e incidentes**, e o responsável por priorizar, distribuir e cobrar. Projetos novos chegam a ele já com brief validado pelo Scope. Toda demanda vira tarefa por ele antes de ir a um especialista. **Mas Nexus não distribui nada diretamente** — toda tarefa passa primeiro pelo gate do Axis.
+- **Nexus (Gestor)** é a **porta de entrada de backlog, priorização, status e incidentes**, e o responsável por priorizar, distribuir e cobrar. Projetos novos chegam a ele já com brief validado pelo Scope, que ele analisa e valida antes de planejar. Toda demanda vira tarefa por ele antes de ir a um especialista. **Mas Nexus não distribui nada diretamente** — toda tarefa passa primeiro pelo gate do Axis.
 - **Axis (Arquiteto)** é **gate obrigatório de pré-distribuição para toda tarefa**, rotineira ou estrutural — não só quando há impacto arquitetural óbvio. Ele valida/prepara a estrutura de projeto e a convenção de nomenclatura antes de qualquer tarefa seguir para um especialista. Na maioria dos casos essa checagem é rápida; ele só aprofunda a análise (opções, trade-offs, ADR) quando identifica impacto estrutural real.
 - **Especialistas (Pyxel, Schema, Forge, Sentinel, Flow)** executam o trabalho técnico dentro do escopo de sua especialidade e **colaboram diretamente entre si** para resolver dependências técnicas pontuais — sem precisar passar pelo Nexus a cada interação, desde que isso não mude prazo, escopo ou prioridade combinados.
 - **Vera (Tester/QA)** é o **portão de qualidade técnica**: toda entrega marcada como "concluída" por um especialista vai para ela antes de seguir adiante. Vera aprova ou reprova (devolvendo ao especialista com apontamentos), em ciclo, até a entrega atender aos critérios de aceite e aos padrões de qualidade do time.
@@ -138,9 +139,11 @@ flowchart LR
     A["Stakeholder apresenta a ideia ao Scope"] --> SC["Scope entrevista em rodadas<br/>e gera o brief funcional"]
     SC --> VB{"Stakeholder valida<br/>e não há dúvidas abertas?"}
     VB -->|"Não (PENDENTE)"| SC
-    VB -->|"Sim (VALIDADO)"| B["Nexus quebra em tarefas"]
+    VB -->|"Sim (VALIDADO)"| NV{"Nexus analisa o brief:<br/>sem questionamentos?"}
+    NV -->|"Não: devolve as dúvidas (PENDENTE)"| SC
+    NV -->|"Sim"| B["Nexus quebra em tarefas"]
     B --> AX["Axis: gate de pré-distribuição<br/>(estrutura + nomenclatura + viabilidade do brief)"]
-    AX -->|"Dúvida de informação<br/>ou brief inviável"| SC
+    AX -->|"Questionamento pendente<br/>ou brief inviável"| SC
     AX --> C{"Impacto<br/>estrutural real?"}
     C -->|"Sim"| ADR["Axis aprofunda:<br/>opções, trade-offs, ADR"]
     ADR --> D["Nexus atribui aos<br/>especialistas certos"]
@@ -157,8 +160,8 @@ flowchart LR
     G --> H["Entrega ao stakeholder"]
 ```
 
-1. Stakeholder leva a ideia ao **Scope**, que a transforma em brief funcional (em rodadas) e obtém a **validação do stakeholder**. Só então o brief segue ao **Nexus**, que quebra em tarefas. (Demandas de backlog, status e incidentes continuam entrando direto pelo Nexus.)
-2. **Toda tarefa passa pelo gate do Axis** antes de qualquer distribuição — sem exceção para tarefas que pareçam rotineiras. Axis valida/prepara a estrutura de projeto (colocando o brief em `docs/brief.md`), a convenção de nomenclatura (identificadores em inglês, comentários/docs em português) e a **viabilidade técnica do brief**. **Enquanto houver dúvida de informação** (fato que só o stakeholder ou terceiros sabem), o brief é tratado como inviável: o Axis não libera nenhuma fase e devolve ao Scope, que abre novo ciclo de esclarecimento em linguagem de negócio. Decisões de desenho (stack, grão, pseudonimização) são do Axis, via ADR, e não bloqueiam.
+1. Stakeholder leva a ideia ao **Scope**, que a transforma em brief funcional (em rodadas) e obtém a **validação do stakeholder**. Só então o brief (`VALIDADO`) segue ao **Nexus**, que o analisa e faz a sua validação; sem questionamento pendente, quebra em tarefas. Com questionamento, devolve ao Scope. (Demandas de backlog, status e incidentes continuam entrando direto pelo Nexus.)
+2. **Toda tarefa passa pelo gate do Axis** antes de qualquer distribuição — sem exceção para tarefas que pareçam rotineiras. Axis valida/prepara a estrutura de projeto (colocando o brief em `docs/brief.md`), a convenção de nomenclatura (identificadores em inglês, comentários/docs em português), e valida a **viabilidade técnica do brief**. **Enquanto houver dúvida de informação** (fato que só o stakeholder ou terceiros sabem), o brief é tratado como inviável: o Axis não libera nenhuma fase e devolve ao Scope, que abre novo ciclo de esclarecimento em linguagem de negócio. Decisões de desenho (stack, grão, pseudonimização) são do Axis, via ADR, e não bloqueiam.
 3. Se o gate identificar impacto estrutural real (nova fonte de dados, novo domínio, nova tecnologia), Axis aprofunda a análise (opções, trade-offs, ADR) antes de liberar. Na maioria dos casos, o gate é rápido e não identifica nada disso.
 4. Nexus distribui tarefas aos especialistas relevantes (ex.: Schema modela, Pyxel constrói pipeline, Flow orquestra).
 5. Especialistas colaboram entre si nas dependências técnicas (ex.: Pyxel usa o schema definido por Schema).
@@ -264,7 +267,7 @@ flowchart LR
 
 | Situação | Acionar primeiro | Colabora com |
 |---|---|---|
-| Projeto novo / ideia vaga / stakeholder não técnico | **Scope** | Nexus (recebe o brief validado), Axis (viabilidade) |
+| Projeto novo / ideia vaga / stakeholder não técnico | **Scope** | Nexus (analisa e valida o brief), Axis (viabilidade no gate) |
 | Nova demanda de negócio já especificada (backlog) | **Nexus** | Axis (gate obrigatório, sempre) |
 | **Toda tarefa antes de ser distribuída** (rotineira ou não) | **Axis (gate obrigatório)** | Nexus |
 | Dúvida sobre prioridade/prazo | **Nexus** | — |
@@ -343,7 +346,7 @@ flowchart TD
 
 ## 7. Princípios do Fluxo
 
-1. **Entrada externa restrita a Scope e Nexus** — Scope para projetos novos e ideias vagas; Nexus para backlog, status e incidentes. Stakeholders não acionam especialistas diretamente, e o Nexus só planeja projeto novo a partir de brief validado.
+1. **Entrada externa restrita a Scope e Nexus** — Scope para projetos novos e ideias vagas; Nexus para backlog, status e incidentes. Stakeholders não acionam especialistas diretamente, e o Nexus só planeja projeto novo a partir de brief validado pelo Scope e analisado por ele; o Axis valida a viabilidade no gate.
 2. **Axis é gate obrigatório de pré-distribuição, em toda tarefa** — não apenas quando há impacto estrutural óbvio. O Nexus nunca distribui sem essa validação, mas o gate é rápido na maioria dos casos.
 3. **Especialistas colaboram lateralmente sem burocracia** — dependências técnicas do dia a dia (ex.: Pyxel precisar de um schema do Schema) não exigem passar pelo Nexus a cada troca.
 4. **Escalação sempre que houver impacto em prazo, escopo ou custo** — qualquer mudança nesses três eixos volta para o Nexus decidir/comunicar.
@@ -358,7 +361,7 @@ flowchart TD
 
 Ao montar o time de agentes em produção, recomenda-se:
 - Configurar **Scope** como porta de entrada de projetos novos/ideias vagas, com a conversa principal mediando as perguntas ao stakeholder entre as invocações.
-- Configurar **Nexus** como o agente "roteador" inicial das demais demandas (backlog, status, incidentes) e de projetos com brief já validado, mas que **sempre** encaminha ao Axis antes de atribuir qualquer tarefa a um especialista — sem atalho para tarefas "óbvias".
+- Configurar **Nexus** como o agente "roteador" inicial das demais demandas (backlog, status, incidentes) e de projetos com brief já validado pelo Scope, mas que **sempre** encaminha ao Axis antes de atribuir qualquer tarefa a um especialista — sem atalho para tarefas "óbvias".
 - Configurar **Axis** como gate automático de pré-distribuição no workflow de tarefas, com foco em ser rápido para o caso comum (estrutura já correta) e só se aprofundar quando genuinamente necessário.
 - Configurar **Vera** e **Codex** como gates sequenciais e obrigatórios de saída no workflow de tarefas — nenhuma tarefa muda para o status "Concluído" sem os dois registros de aprovação.
 - Manter o **template de estrutura de projetos e a convenção de nomenclatura (EN/PT)**, mantidos pelo Axis, documentados e acessíveis — é o que ele usa para validar rapidamente cada tarefa no gate de entrada.

@@ -21,7 +21,7 @@ O time é composto por **10 agentes** organizados em cinco camadas funcionais:
 └─────────────────────────────────────────────────────────┘
 ```
 
-Projetos novos ou ideias vagas entram pelo **Scope**, que entrega um brief funcional validado pelo stakeholder antes de o Nexus planejar. Nenhuma tarefa é distribuída sem passar antes pelo **gate de pré-distribuição do Axis** (estrutura de projeto e nomenclatura). Nenhuma entrega é considerada concluída sem passar pelo **duplo gate de saída**: **Vera** (corretude técnica) → **Codex** (documentação/catalogação). Só então retorna ao **Nexus**.
+Projetos novos ou ideias vagas entram pelo **Scope**, que entrega um brief funcional validado pelo stakeholder; o **Nexus** o analisa antes de planejar e o **Axis** o valida no gate; qualquer questionamento devolve o brief ao Scope. Nenhuma tarefa é distribuída sem passar antes pelo **gate de pré-distribuição do Axis** (estrutura de projeto e nomenclatura). Nenhuma entrega é considerada concluída sem passar pelo **duplo gate de saída**: **Vera** (corretude técnica) → **Codex** (documentação/catalogação). Só então retorna ao **Nexus**.
 
 ---
 
@@ -45,7 +45,7 @@ Projetos novos ou ideias vagas entram pelo **Scope**, que entrega um brief funci
 ## Princípios Arquiteturais
 
 1. **Entrada externa restrita a dois agentes** — **Scope** é a porta para projetos novos e ideias vagas (stakeholders sem conhecimento técnico não precisam escrever especificação); **Nexus** é a porta para backlog, priorização, status e incidentes. Nenhum especialista recebe demanda de negócio diretamente.
-1a. **Enquanto houver dúvida, o brief não segue** — o brief tem dois status: `PENDENTE` (há pergunta em aberto ou premissa não aceita) e `VALIDADO` (confirmado pelo stakeholder **e** sem dúvidas abertas). Só `VALIDADO` chega ao Nexus e ao Axis. No gate, o Axis separa **dúvida de informação** (fato que só o stakeholder ou terceiros sabem — bloqueia e devolve ao Scope, sem liberar nem fase de "levantamento") de **decisão de desenho** (stack, grão, pseudonimização — resolvida pelo Axis via ADR, não bloqueia). Devolução do Axis abre novo ciclo de esclarecimento no Scope. Subagentes não conversam com o usuário no meio da execução, então a entrevista do Scope é feita em **rodadas** (máx. 3, ~5 perguntas cada), mediadas pela conversa principal.
+1a. **Três validações em sequência, e enquanto houver questionamento o brief não segue** — o brief tem dois status: `PENDENTE` (há questionamento pendente) e `VALIDADO` (pelo Scope: confirmado pelo stakeholder e sem perguntas em aberto). `VALIDADO` segue ao **Nexus**, que o analisa e faz a sua validação antes de planejar; depois, no gate, o **Axis** valida a viabilidade. Cada um só considera o brief validado quando não houver questionamento pendente, e qualquer questionamento devolve o brief ao Scope como `PENDENTE` — o Scope valida as respostas com o stakeholder e o reenvia a quem devolveu. O brief contém **apenas fatos concretos** ditos ou confirmados pelo stakeholder — sem premissas nem notas interpretativas; riscos e decisões de desenho são levantados pelo Axis. O Axis separa **dúvida de informação** (fato que só o stakeholder ou terceiros sabem — bloqueia, sem liberar nem fase de "levantamento") de **decisão de desenho** (stack, grão, pseudonimização — resolvida por ADR, não bloqueia). Subagentes não conversam com o usuário no meio da execução, então a entrevista do Scope é feita em **rodadas** (máx. 3 por ciclo, ~5 perguntas cada — limite que não vale para sanear dúvidas levantadas pelo Nexus ou pelo Axis), mediadas pela conversa principal.
 2. **Separação entre gestão e arquitetura** — Nexus prioriza e aloca; **Axis** garante solidez técnica de longo prazo. Um não substitui o outro.
 3. **Colaboração lateral sem burocracia** — especialistas resolvem dependências técnicas entre si sem precisar do Nexus a cada troca, desde que prazo/escopo/custo não mudem.
 4. **Qualidade e documentação são gates formais, não etapas opcionais** — toda entrega passa por **Vera** e depois por **Codex** antes de ser considerada concluída.
@@ -63,12 +63,14 @@ Projetos novos ou ideias vagas entram pelo **Scope**, que entrega um brief funci
 ```mermaid
 flowchart TD
     S["Stakeholder"] -->|"projeto novo / ideia vaga"| SC["Scope: entrevista em rodadas<br/>→ brief funcional"]
-    SC --> VAL{"Stakeholder<br/>valida o brief?"}
-    VAL -->|"ajustes / dúvidas abertas<br/>(status PENDENTE)"| SC
-    VAL -->|"VALIDADO<br/>(sem dúvidas abertas)"| N["Nexus recebe e quebra em tarefas"]
+    SC --> VAL{"Stakeholder valida e<br/>não há perguntas em aberto?"}
+    VAL -->|"não (PENDENTE)"| SC
+    VAL -->|"sim (VALIDADO)"| NV{"Nexus analisa o brief:<br/>sem questionamentos?"}
+    NV -->|"não: devolve as dúvidas<br/>(PENDENTE)"| SC
+    NV -->|"sim"| N["Nexus quebra em tarefas"]
     S -->|"backlog / status / incidente"| N
     N --> AX["Axis: gate de pré-distribuição<br/>+ viabilidade do brief<br/>(toda tarefa, sem exceção)"]
-    AX -->|"dúvida de informação<br/>ou brief inviável"| SC
+    AX -->|"questionamento pendente<br/>ou brief inviável"| SC
     AX -->|"estrutura ok / preparada"| T["Nexus distribui tarefa"]
     AX -->|"impacto estrutural identificado"| ADR["Axis aprofunda:<br/>opções, trade-offs, ADR"]
     ADR --> T
@@ -81,7 +83,7 @@ flowchart TD
     N2 --> S2["Reporta ao stakeholder"]
 ```
 
-O gate do Axis (logo após o Nexus) é **obrigatório para toda tarefa**, rotineira ou não. Na maioria dos casos ele apenas confirma que a estrutura de projeto e a convenção de nomenclatura já estão corretas — sem atraso perceptível. Só quando identifica impacto estrutural real é que aprofunda a análise (opções, trade-offs, ADR) antes de liberar a distribuição.
+Para projetos novos, o Nexus valida o brief antes de planejar, e o Axis valida a viabilidade dele no gate. O gate do Axis (logo após o Nexus) é **obrigatório para toda tarefa**, rotineira ou não. Na maioria dos casos ele apenas confirma que a estrutura de projeto e a convenção de nomenclatura já estão corretas — sem atraso perceptível. Só quando identifica impacto estrutural real é que aprofunda a análise (opções, trade-offs, ADR) antes de liberar a distribuição.
 
 Este fluxo se repete, com variações de entrada, para os quatro cenários documentados no organograma detalhado: **demanda de negócio**, **incidente de dados**, **decisão arquitetural** e **tarefa técnica rotineira**.
 
