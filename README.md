@@ -10,7 +10,7 @@
    cada projeto de dados novo, um subdiretório por projeto.
 4. Reinicie o Claude Code (necessário na primeira vez que a pasta
    .claude/agents/ é criada) ou abra uma nova sessão no projeto.
-5. Rode `/agents` para confirmar que os 9 subagentes foram carregados.
+5. Rode `/agents` para confirmar que os 10 subagentes foram carregados.
 
 ## Agentes incluídos
 

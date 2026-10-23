@@ -6,10 +6,11 @@
 
 ## Visão Geral
 
-O time é composto por **9 agentes** organizados em quatro camadas funcionais:
+O time é composto por **10 agentes** organizados em cinco camadas funcionais:
 
 ```
 ┌─────────────────────────────────────────────────────────┐
+│  DESCOBERTA       Scope (Analista de Requisitos)           │
 │  GESTÃO           Nexus (Gestor/Líder Técnico)            │
 │  ARQUITETURA      Axis (Arquiteto de Dados)                │
 ├─────────────────────────────────────────────────────────┤
@@ -20,7 +21,7 @@ O time é composto por **9 agentes** organizados em quatro camadas funcionais:
 └─────────────────────────────────────────────────────────┘
 ```
 
-Nenhuma tarefa é distribuída sem passar antes pelo **gate de pré-distribuição do Axis** (estrutura de projeto e nomenclatura). Nenhuma entrega é considerada concluída sem passar pelo **duplo gate de saída**: **Vera** (corretude técnica) → **Codex** (documentação/catalogação). Só então retorna ao **Nexus**.
+Projetos novos ou ideias vagas entram pelo **Scope**, que entrega um brief funcional validado pelo stakeholder antes de o Nexus planejar. Nenhuma tarefa é distribuída sem passar antes pelo **gate de pré-distribuição do Axis** (estrutura de projeto e nomenclatura). Nenhuma entrega é considerada concluída sem passar pelo **duplo gate de saída**: **Vera** (corretude técnica) → **Codex** (documentação/catalogação). Só então retorna ao **Nexus**.
 
 ---
 
@@ -28,21 +29,23 @@ Nenhuma tarefa é distribuída sem passar antes pelo **gate de pré-distribuiç�
 
 | # | Agente | Papel | Camada | Arquivo (`.claude/agents/`) |
 |---|---|---|---|---|
-| 1 | **Nexus** | Líder Técnico / Gestor de Engenharia de Dados | Gestão | `nexus.md` |
-| 2 | **Axis** | Arquiteto de Dados | Arquitetura | `axis.md` |
-| 3 | **Pyxel** | Python para Dados | Execução | `pyxel.md` |
-| 4 | **Schema** | SQL e Modelagem de Dados | Execução | `schema.md` |
-| 5 | **Forge** | Infraestrutura e Cloud | Execução | `forge.md` |
-| 6 | **Sentinel** | Qualidade e Governança de Dados | Execução | `sentinel.md` |
-| 7 | **Flow** | Orquestração e Pipelines | Execução | `flow.md` |
-| 8 | **Vera** | Testadora / QA de Entregas | Qualidade | `vera.md` |
-| 9 | **Codex** | Documentação e Catalogação de Dados | Documentação | `codex.md` |
+| 1 | **Scope** | Analista de Requisitos (brief funcional) | Descoberta | `scope.md` |
+| 2 | **Nexus** | Líder Técnico / Gestor de Engenharia de Dados | Gestão | `nexus.md` |
+| 3 | **Axis** | Arquiteto de Dados | Arquitetura | `axis.md` |
+| 4 | **Pyxel** | Python para Dados | Execução | `pyxel.md` |
+| 5 | **Schema** | SQL e Modelagem de Dados | Execução | `schema.md` |
+| 6 | **Forge** | Infraestrutura e Cloud | Execução | `forge.md` |
+| 7 | **Sentinel** | Qualidade e Governança de Dados | Execução | `sentinel.md` |
+| 8 | **Flow** | Orquestração e Pipelines | Execução | `flow.md` |
+| 9 | **Vera** | Testadora / QA de Entregas | Qualidade | `vera.md` |
+| 10 | **Codex** | Documentação e Catalogação de Dados | Documentação | `codex.md` |
 
 ---
 
 ## Princípios Arquiteturais
 
-1. **Ponto único de entrada externo** — stakeholders só acionam **Nexus**; nenhum especialista recebe demanda de negócio diretamente.
+1. **Entrada externa restrita a dois agentes** — **Scope** é a porta para projetos novos e ideias vagas (stakeholders sem conhecimento técnico não precisam escrever especificação); **Nexus** é a porta para backlog, priorização, status e incidentes. Nenhum especialista recebe demanda de negócio diretamente.
+1a. **Brief validado antes do planejamento** — o Nexus só quebra um projeto novo em tarefas a partir de um brief funcional validado pelo stakeholder. Subagentes não conversam com o usuário no meio da execução, então a entrevista do Scope é feita em **rodadas** (máx. 3, ~5 perguntas cada), mediadas pela conversa principal.
 2. **Separação entre gestão e arquitetura** — Nexus prioriza e aloca; **Axis** garante solidez técnica de longo prazo. Um não substitui o outro.
 3. **Colaboração lateral sem burocracia** — especialistas resolvem dependências técnicas entre si sem precisar do Nexus a cada troca, desde que prazo/escopo/custo não mudem.
 4. **Qualidade e documentação são gates formais, não etapas opcionais** — toda entrega passa por **Vera** e depois por **Codex** antes de ser considerada concluída.
@@ -59,8 +62,13 @@ Nenhuma tarefa é distribuída sem passar antes pelo **gate de pré-distribuiç�
 
 ```mermaid
 flowchart TD
-    S["Stakeholder"] --> N["Nexus recebe e quebra em tarefas"]
-    N --> AX["Axis: gate de pré-distribuição<br/>(toda tarefa, sem exceção)"]
+    S["Stakeholder"] -->|"projeto novo / ideia vaga"| SC["Scope: entrevista em rodadas<br/>→ brief funcional"]
+    SC --> VAL{"Stakeholder<br/>valida o brief?"}
+    VAL -->|"ajustes"| SC
+    VAL -->|"validado"| N["Nexus recebe e quebra em tarefas"]
+    S -->|"backlog / status / incidente"| N
+    N --> AX["Axis: gate de pré-distribuição<br/>+ viabilidade do brief<br/>(toda tarefa, sem exceção)"]
+    AX -->|"brief inviável"| SC
     AX -->|"estrutura ok / preparada"| T["Nexus distribui tarefa"]
     AX -->|"impacto estrutural identificado"| ADR["Axis aprofunda:<br/>opções, trade-offs, ADR"]
     ADR --> T
@@ -83,7 +91,8 @@ Este fluxo se repete, com variações de entrada, para os quatro cenários docum
 
 | Situação | Acionar |
 |---|---|
-| Nova demanda / dúvida de prioridade | Nexus |
+| Projeto novo / ideia vaga / stakeholder não técnico | **Scope** |
+| Demanda de backlog / dúvida de prioridade / status | Nexus |
 | **Toda tarefa antes de distribuir** (estrutura/nomenclatura) | **Axis (gate obrigatório)** |
 | Nova arquitetura / mudança de stack | Axis |
 | Pipeline/código | Pyxel |

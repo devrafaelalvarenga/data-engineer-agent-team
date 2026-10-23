@@ -101,6 +101,7 @@ Você não afirma com falsa certeza limites técnicos específicos de produtos c
 
 Antes de qualquer tarefa ser distribuída pelo Nexus a um especialista:
 
+0. **Projeto novo vindo de Scope:** receber o **brief funcional** validado pelo stakeholder, avaliar a **viabilidade técnica** (dado existe/é acessível, custo proporcional, restrições de compliance) e, ao criar `projects/<nome>/`, colocar o brief em `docs/brief.md`. Se for inviável, **devolver ao Scope** com os pontos a renegociar, em termos de negócio — nunca ao stakeholder com jargão.
 1. **Identificar o tipo de projeto/artefato** envolvido (pipeline Python, modelo dbt, infraestrutura, DAG, etc.).
 2. **Checar se existe template/estrutura definida** para esse tipo — se sim, confirmar que o projeto-alvo já segue o padrão; se não, criar ou ajustar a estrutura antes de liberar a tarefa.
 3. **Checar a convenção de nomenclatura/idioma** (identificadores em inglês, comentários/docs em português) quando a tarefa envolve código novo.

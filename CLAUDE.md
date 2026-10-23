@@ -17,8 +17,9 @@ A arquitetura completa do time (papéis, fluxo de decisão, gates obrigatórios)
 ├── README.md                # instruções de instalação do pacote de agentes
 ├── .claude/
 │   ├── settings.json         # Plan Mode como padrão da sessão
-│   └── agents/                # os 9 subagentes do time
-│       ├── nexus.md           # Gestor — único ponto de entrada de demandas
+│   └── agents/                # os 10 subagentes do time
+│       ├── scope.md           # Analista de requisitos — porta de entrada de projetos novos
+│       ├── nexus.md           # Gestor — entrada de backlog/status/incidentes
 │       ├── axis.md            # Arquiteto — gate obrigatório de pré-distribuição
 │       ├── pyxel.md           # Python / pipelines
 │       ├── schema.md          # SQL / modelagem
@@ -40,7 +41,8 @@ A arquitetura completa do time (papéis, fluxo de decisão, gates obrigatórios)
 
 ## Fluxo de trabalho obrigatório (resumo — ver ARCHITECTURE.md para detalhes)
 
-1. **Toda demanda começa pelo `nexus`** — não delegue direto a um especialista sem passar por ele primeiro, mesmo em conversas informais neste chat.
+0. **Projeto novo ou ideia vaga começa pelo `scope`** — ele devolve perguntas ou um brief funcional; a conversa principal media as perguntas ao stakeholder (subagentes não conversam com o usuário) e o brief só segue adiante depois de validado por ele. Máx. 3 rodadas.
+1. **Toda demanda começa pelo `nexus`** (projetos novos: com o brief validado do `scope`) — não delegue direto a um especialista sem passar por ele primeiro, mesmo em conversas informais neste chat.
 2. **Toda tarefa passa pelo gate do `axis`** antes de ser distribuída — rotineira ou não. É ele quem confirma/prepara a estrutura em `/projects/<nome>/` e a convenção de nomenclatura antes de qualquer especialista começar a trabalhar.
 3. **Especialistas** (`pyxel`, `schema`, `forge`, `sentinel`, `flow`) implementam dentro do subdiretório de projeto já validado pelo Axis.
 4. **Toda entrega passa por `vera`** (corretude técnica) e depois por `codex` (documentação/catalogação) antes de ser considerada concluída — sem exceção para tarefas simples.
@@ -54,9 +56,9 @@ A arquitetura completa do time (papéis, fluxo de decisão, gates obrigatórios)
 
 ## Comandos úteis
 
-Este repositório não tem build/lint/test próprio — os 9 arquivos em `.claude/agents/` são prompts (Markdown + YAML), não código executável. Comandos relevantes ao trabalhar aqui:
+Este repositório não tem build/lint/test próprio — os 10 arquivos em `.claude/agents/` são prompts (Markdown + YAML), não código executável. Comandos relevantes ao trabalhar aqui:
 
-- `/agents` — confirma que os 9 subagentes foram carregados corretamente numa sessão nova.
+- `/agents` — confirma que os 10 subagentes foram carregados corretamente numa sessão nova.
 - `Shift+Tab` — alterna a sessão para fora do Plan Mode (`acceptEdits`) quando necessário.
 - Uma vez que um projeto real exista em `/projects/<nome>/`, seus próprios comandos de build/lint/test são definidos pelo stack escolhido pelo especialista responsável e documentados pelo `codex` dentro do próprio subdiretório — não aqui.
 
@@ -66,8 +68,8 @@ Este projeto usa `"defaultMode": "plan"` em `.claude/settings.json`. Toda sessã
 
 ## Otimização de tokens (decisão de arquitetura)
 
-- **`omitClaudeMd: true`** está definido em `pyxel`, `schema`, `forge`, `sentinel`, `flow`, `vera` e `codex`. Esses agentes recebem o caminho exato do projeto e o contexto necessário já dentro da própria tarefa delegada pelo Nexus/Axis — não precisam recarregar este `CLAUDE.md` inteiro a cada invocação. **`nexus` e `axis` mantêm o carregamento normal**, pois orquestram o fluxo e usam a estrutura do repositório diretamente.
-- **`vera` e `codex` rodam em `model: haiku`** — testar contra critérios já definidos e catalogar um artefato já aprovado são tarefas mais mecânicas/estruturadas, que não exigem o raciocínio mais caro de um modelo maior. Os demais especialistas seguem em `sonnet`, e o `axis` em `opus` (decisões estruturais se beneficiam de mais capacidade de raciocínio).
+- **`omitClaudeMd: true`** está definido em `scope`, `pyxel`, `schema`, `forge`, `sentinel`, `flow`, `vera` e `codex`. Esses agentes recebem o caminho exato do projeto e o contexto necessário já dentro da própria tarefa delegada pelo Nexus/Axis — não precisam recarregar este `CLAUDE.md` inteiro a cada invocação. **`nexus` e `axis` mantêm o carregamento normal**, pois orquestram o fluxo e usam a estrutura do repositório diretamente.
+- **`vera` e `codex` rodam em `model: haiku`** — testar contra critérios já definidos e catalogar um artefato já aprovado são tarefas mais mecânicas/estruturadas, que não exigem o raciocínio mais caro de um modelo maior. Os demais especialistas e o `scope` seguem em `sonnet`, e o `axis` em `opus` (decisões estruturais se beneficiam de mais capacidade de raciocínio).
 - Ao editar os arquivos de subagente, mantenha as `description` enxutas — o Claude Code carrega a descrição de **todos** os subagentes no início de toda sessão (soma acima de 15.000 tokens gera aviso); detalhe extra deve ir no corpo do prompt, que só carrega quando o agente é de fato invocado.
 
 ## Ao trabalhar fora dos subagentes (nesta conversa principal)
