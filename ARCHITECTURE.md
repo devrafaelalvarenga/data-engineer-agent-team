@@ -33,7 +33,7 @@ Projetos novos ou ideias vagas entram pelo **Scope**, que entrega um brief funci
 | 2 | **Nexus** | Líder Técnico / Gestor de Engenharia de Dados | Gestão | `nexus.md` |
 | 3 | **Axis** | Arquiteto de Dados | Arquitetura | `axis.md` |
 | 4 | **Pyxel** | Python para Dados | Execução | `pyxel.md` |
-| 5 | **Schema** | SQL e Modelagem de Dados | Execução | `schema.md` |
+| 5 | **Schema** | SQL, Modelagem e Camada de Consumo (painéis de BI) | Execução | `schema.md` |
 | 6 | **Forge** | Infraestrutura e Cloud | Execução | `forge.md` |
 | 7 | **Sentinel** | Qualidade e Governança de Dados | Execução | `sentinel.md` |
 | 8 | **Flow** | Orquestração e Pipelines | Execução | `flow.md` |
@@ -45,7 +45,7 @@ Projetos novos ou ideias vagas entram pelo **Scope**, que entrega um brief funci
 ## Princípios Arquiteturais
 
 1. **Entrada externa restrita a dois agentes** — **Scope** é a porta para projetos novos e ideias vagas (stakeholders sem conhecimento técnico não precisam escrever especificação); **Nexus** é a porta para backlog, priorização, status e incidentes. Nenhum especialista recebe demanda de negócio diretamente.
-1a. **Brief validado antes do planejamento** — o Nexus só quebra um projeto novo em tarefas a partir de um brief funcional validado pelo stakeholder. Subagentes não conversam com o usuário no meio da execução, então a entrevista do Scope é feita em **rodadas** (máx. 3, ~5 perguntas cada), mediadas pela conversa principal.
+1a. **Enquanto houver dúvida, o brief não segue** — o brief tem dois status: `PENDENTE` (há pergunta em aberto ou premissa não aceita) e `VALIDADO` (confirmado pelo stakeholder **e** sem dúvidas abertas). Só `VALIDADO` chega ao Nexus. No gate, o Axis separa **dúvida de informação** (fato que só o stakeholder ou terceiros sabem — bloqueia e devolve ao Scope, sem liberar nem fase de "levantamento") de **decisão de desenho** (stack, grão, pseudonimização — resolvida pelo Axis via ADR, não bloqueia). Devolução do Axis abre novo ciclo de esclarecimento no Scope. Subagentes não conversam com o usuário no meio da execução, então a entrevista do Scope é feita em **rodadas** (máx. 3, ~5 perguntas cada), mediadas pela conversa principal.
 2. **Separação entre gestão e arquitetura** — Nexus prioriza e aloca; **Axis** garante solidez técnica de longo prazo. Um não substitui o outro.
 3. **Colaboração lateral sem burocracia** — especialistas resolvem dependências técnicas entre si sem precisar do Nexus a cada troca, desde que prazo/escopo/custo não mudem.
 4. **Qualidade e documentação são gates formais, não etapas opcionais** — toda entrega passa por **Vera** e depois por **Codex** antes de ser considerada concluída.
@@ -64,11 +64,11 @@ Projetos novos ou ideias vagas entram pelo **Scope**, que entrega um brief funci
 flowchart TD
     S["Stakeholder"] -->|"projeto novo / ideia vaga"| SC["Scope: entrevista em rodadas<br/>→ brief funcional"]
     SC --> VAL{"Stakeholder<br/>valida o brief?"}
-    VAL -->|"ajustes"| SC
-    VAL -->|"validado"| N["Nexus recebe e quebra em tarefas"]
+    VAL -->|"ajustes / dúvidas abertas<br/>(status PENDENTE)"| SC
+    VAL -->|"VALIDADO<br/>(sem dúvidas abertas)"| N["Nexus recebe e quebra em tarefas"]
     S -->|"backlog / status / incidente"| N
     N --> AX["Axis: gate de pré-distribuição<br/>+ viabilidade do brief<br/>(toda tarefa, sem exceção)"]
-    AX -->|"brief inviável"| SC
+    AX -->|"dúvida de informação<br/>ou brief inviável"| SC
     AX -->|"estrutura ok / preparada"| T["Nexus distribui tarefa"]
     AX -->|"impacto estrutural identificado"| ADR["Axis aprofunda:<br/>opções, trade-offs, ADR"]
     ADR --> T

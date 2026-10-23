@@ -12,7 +12,7 @@ Este documento consolida os agentes criados, suas relações hierárquicas/funci
 | Gestor | **Nexus** | Líder Técnico / Gestor de Engenharia de Dados | Gestão de pessoas, priorização, interlocução com negócio (backlog, status, incidentes) |
 | Arquitetura | **Axis** | Arquiteto de Dados | Estratégico/transversal — padrões, decisões estruturais |
 | Especialista | **Pyxel** | Python para Dados | Execução — pipelines, ETL/ELT, automação |
-| Especialista | **Schema** | SQL e Modelagem de Dados | Execução — modelagem, transformação, queries |
+| Especialista | **Schema** | SQL, Modelagem e Camada de Consumo | Execução — modelagem, transformação, queries, painéis de BI |
 | Especialista | **Forge** | Infraestrutura e Cloud | Execução — provisionamento, segurança, custo |
 | Especialista | **Sentinel** | Qualidade e Governança de Dados | Execução — validação, lineage, compliance |
 | Especialista | **Flow** | Orquestração e Pipelines | Execução — scheduling, dependências, confiabilidade |
@@ -30,7 +30,7 @@ graph TD
 
     SCOPE["🔍 Scope<br/>Analista de Requisitos<br/><i>entrevista em rodadas → brief funcional</i>"]
     SCOPE -->|"brief validado<br/>pelo stakeholder"| NEXUS
-    AXIS -.->|"brief inviável:<br/>renegociar escopo"| SCOPE
+    AXIS -.->|"dúvida de informação<br/>ou brief inviável"| SCOPE
 
     NEXUS["🧑‍💼 Nexus<br/>Gestor / Líder Técnico<br/><i>gestão, priorização, cobrança</i>"]
     AXIS["🏛️ Axis<br/>Arquiteto de Dados<br/><i>gate obrigatório de pré-distribuição<br/>+ decisões estruturais</i>"]
@@ -51,7 +51,7 @@ graph TD
     AXIS -.->|"define padrões, templates<br/>de pasta e nomenclatura"| FLOW
 
     PYXEL["🐍 Pyxel<br/>Python para Dados"]
-    SCHEMA["🗄️ Schema<br/>SQL e Modelagem"]
+    SCHEMA["🗄️ Schema<br/>SQL, Modelagem e BI"]
     FORGE["☁️ Forge<br/>Infra e Cloud"]
     SENTINEL["🛡️ Sentinel<br/>Qualidade e Governança"]
     FLOW["🔄 Flow<br/>Orquestração"]
@@ -136,11 +136,11 @@ graph TD
 ```mermaid
 flowchart LR
     A["Stakeholder apresenta a ideia ao Scope"] --> SC["Scope entrevista em rodadas<br/>e gera o brief funcional"]
-    SC --> VB{"Stakeholder<br/>valida o brief?"}
-    VB -->|"Ajustes"| SC
-    VB -->|"Sim"| B["Nexus quebra em tarefas"]
+    SC --> VB{"Stakeholder valida<br/>e não há dúvidas abertas?"}
+    VB -->|"Não (PENDENTE)"| SC
+    VB -->|"Sim (VALIDADO)"| B["Nexus quebra em tarefas"]
     B --> AX["Axis: gate de pré-distribuição<br/>(estrutura + nomenclatura + viabilidade do brief)"]
-    AX -->|"Brief inviável"| SC
+    AX -->|"Dúvida de informação<br/>ou brief inviável"| SC
     AX --> C{"Impacto<br/>estrutural real?"}
     C -->|"Sim"| ADR["Axis aprofunda:<br/>opções, trade-offs, ADR"]
     ADR --> D["Nexus atribui aos<br/>especialistas certos"]
@@ -158,7 +158,7 @@ flowchart LR
 ```
 
 1. Stakeholder leva a ideia ao **Scope**, que a transforma em brief funcional (em rodadas) e obtém a **validação do stakeholder**. Só então o brief segue ao **Nexus**, que quebra em tarefas. (Demandas de backlog, status e incidentes continuam entrando direto pelo Nexus.)
-2. **Toda tarefa passa pelo gate do Axis** antes de qualquer distribuição — sem exceção para tarefas que pareçam rotineiras. Axis valida/prepara a estrutura de projeto (colocando o brief em `docs/brief.md`), a convenção de nomenclatura (identificadores em inglês, comentários/docs em português) e a **viabilidade técnica do brief**; se inviável, devolve ao Scope para renegociar o escopo em linguagem de negócio.
+2. **Toda tarefa passa pelo gate do Axis** antes de qualquer distribuição — sem exceção para tarefas que pareçam rotineiras. Axis valida/prepara a estrutura de projeto (colocando o brief em `docs/brief.md`), a convenção de nomenclatura (identificadores em inglês, comentários/docs em português) e a **viabilidade técnica do brief**. **Enquanto houver dúvida de informação** (fato que só o stakeholder ou terceiros sabem), o brief é tratado como inviável: o Axis não libera nenhuma fase e devolve ao Scope, que abre novo ciclo de esclarecimento em linguagem de negócio. Decisões de desenho (stack, grão, pseudonimização) são do Axis, via ADR, e não bloqueiam.
 3. Se o gate identificar impacto estrutural real (nova fonte de dados, novo domínio, nova tecnologia), Axis aprofunda a análise (opções, trade-offs, ADR) antes de liberar. Na maioria dos casos, o gate é rápido e não identifica nada disso.
 4. Nexus distribui tarefas aos especialistas relevantes (ex.: Schema modela, Pyxel constrói pipeline, Flow orquestra).
 5. Especialistas colaboram entre si nas dependências técnicas (ex.: Pyxel usa o schema definido por Schema).
