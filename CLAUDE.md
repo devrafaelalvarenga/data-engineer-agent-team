@@ -77,6 +77,14 @@ Este projeto usa `"defaultMode": "plan"` em `.claude/settings.json`. Toda sessã
 - **`vera` e `codex` rodam em `model: haiku`** — testar contra critérios já definidos e catalogar um artefato já aprovado são tarefas mais mecânicas/estruturadas, que não exigem o raciocínio mais caro de um modelo maior. Os demais especialistas e o `scope` seguem em `sonnet`, e o `axis` em `opus` (decisões estruturais se beneficiam de mais capacidade de raciocínio).
 - Ao editar os arquivos de subagente, mantenha as `description` enxutas — o Claude Code carrega a descrição de **todos** os subagentes no início de toda sessão (soma acima de 15.000 tokens gera aviso); detalhe extra deve ir no corpo do prompt, que só carrega quando o agente é de fato invocado.
 
+## Repasse de estado entre invocações (conversa principal)
+
+Cada invocação de subagente é **isolada**: ele não lembra das anteriores e só enxerga o que vem no prompt (e o que está gravado em disco). Por isso, a cada chamada a conversa principal deve repassar **todo o estado necessário**, sem resumir nem reconstruir de memória:
+
+- **Scope**: ideia bruta + fatos e respostas de **todas** as rodadas anteriores + o **texto integral do brief anterior** (itens 1 a 11, com status) quando houver. Sem o brief, o Scope não consegue atualizá-lo e se recusa a reconstruí-lo (e deve se recusar).
+- **Nexus, Axis, especialistas, Vera, Codex e Deploy**: o brief `VALIDADO` completo (ou o caminho de `projects/<nome>/docs/brief.md`, quando já gravado), o plano de tarefas do Nexus, as decisões do Axis (ADRs, estrutura de pastas, quem atua), o escopo exato da tarefa e as **aprovações já obtidas** (Vera, Codex, Axis, humana) com a versão a que se referem.
+- Cole os textos integrais; não escreva "o brief da rodada anterior". O que já está em disco pode ser passado por caminho.
+
 ## Ao trabalhar fora dos subagentes (nesta conversa principal)
 
 Se o pedido do usuário for sobre os **agentes/arquitetura do time** (criar, ajustar, revisar um papel), trabalhe nos arquivos de `.claude/agents/` e em `ARCHITECTURE.md` diretamente.
