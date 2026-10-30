@@ -10,11 +10,11 @@
    cada projeto de dados novo, um subdiretório por projeto.
 4. Reinicie o Claude Code (necessário na primeira vez que a pasta
    .claude/agents/ é criada) ou abra uma nova sessão no projeto.
-5. Rode `/agents` para confirmar que os 10 subagentes foram carregados.
+5. Rode `/agents` para confirmar que os 11 subagentes foram carregados.
 
 ## Agentes incluídos
 
-nexus · axis · pyxel · schema · forge · sentinel · flow · vera · codex
+nexus · axis · pyxel · schema · forge · sentinel · flow · vera · codex · deploy
 
 Veja ARCHITECTURE.md para o papel de cada um e o fluxo de trabalho completo.
 Veja CLAUDE.md para a estrutura do repositório e as regras práticas
@@ -42,5 +42,6 @@ antes de assumir" já presente nos prompts do Nexus e do Axis.
   que indica a quem delegar; ao final de uma tarefa técnica, peça
   explicitamente "use a vera para validar essa entrega" e depois
   "use o codex para documentar", replicando o duplo gate antes de
-  considerar algo concluído.
+  considerar algo concluído; para colocar no ar, "use o deploy para implantar"
+  (produção exige aprovação do Axis e confirmação humana).
 # data-engineer-agent-team

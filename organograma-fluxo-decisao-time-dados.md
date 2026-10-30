@@ -18,6 +18,7 @@ Este documento consolida os agentes criados, suas relações hierárquicas/funci
 | Especialista | **Flow** | Orquestração e Pipelines | Execução — scheduling, dependências, confiabilidade |
 | QA / Tester | **Vera** | Testadora / QA de Entregas | Portão de qualidade — aprova ou reprova toda entrega concluída |
 | Documentação | **Codex** | Documentação e Catalogação de Dados | Consolida, padroniza e mantém viva a documentação após aprovação técnica |
+| Implantação | **Deploy** | Release / Implantação | Implanta a entrega aprovada (só staging e produção, em janela de manutenção, blue/green para tabelas), valida com smoke test e reverte se falhar; produção com aprovação do Axis (projeto aplicado) e humana (atividades de subida) |
 
 ---
 
@@ -58,6 +59,7 @@ graph TD
     FLOW["🔄 Flow<br/>Orquestração"]
     VERA["🧪 Vera<br/>Tester / QA<br/><i>aprova ou reprova entregas</i>"]
     CODEX["📚 Codex<br/>Documentação e Catalogação<br/><i>padroniza e mantém o catálogo</i>"]
+    DEPLOY["🚀 Deploy<br/>Release / Implantação<br/><i>implanta o aprovado; prod: Axis + aprovação humana</i>"]
 
     PYXEL <-->|contratos de dados,<br/>schemas| SCHEMA
     PYXEL <-->|ambiente de execução| FORGE
@@ -90,7 +92,10 @@ graph TD
     CODEX -.->|"⚠️ documentação<br/>insuficiente"| FLOW
     CODEX -.->|"documenta decisões"| AXIS
 
-    CODEX ==>|"✅ catalogado e documentado"| NEXUS
+    CODEX -->|"✅ catalogado e documentado"| DEPLOY
+    DEPLOY -.->|"❌ falha: rollback<br/>e devolve"| NEXUS
+    DEPLOY ==>|"✅ implantado e verificado"| NEXUS
+    FORGE -.->|"provisiona a infraestrutura"| DEPLOY
 
     classDef gestor fill:#2563eb,color:#fff,stroke:#1e40af
     classDef arq fill:#7c3aed,color:#fff,stroke:#5b21b6
@@ -126,7 +131,8 @@ graph TD
 - **Axis (Arquiteto)** é **gate obrigatório de pré-distribuição para toda tarefa**, rotineira ou estrutural — não só quando há impacto arquitetural óbvio. Ele valida/prepara a estrutura de projeto e a convenção de nomenclatura antes de qualquer tarefa seguir para um especialista. Na maioria dos casos essa checagem é rápida; ele só aprofunda a análise (opções, trade-offs, ADR) quando identifica impacto estrutural real.
 - **Especialistas (Pyxel, Schema, Forge, Sentinel, Flow)** executam o trabalho técnico dentro do escopo de sua especialidade e **colaboram diretamente entre si** para resolver dependências técnicas pontuais — sem precisar passar pelo Nexus a cada interação, desde que isso não mude prazo, escopo ou prioridade combinados.
 - **Vera (Tester/QA)** é o **portão de qualidade técnica**: toda entrega marcada como "concluída" por um especialista vai para ela antes de seguir adiante. Vera aprova ou reprova (devolvendo ao especialista com apontamentos), em ciclo, até a entrega atender aos critérios de aceite e aos padrões de qualidade do time.
-- **Codex (Documentação/Catalogação)** é o **portão de documentação**: entra **depois** da aprovação técnica da Vera. Garante que a entrega está documentada, padronizada e catalogada antes de ser considerada verdadeiramente finalizada. Se a documentação estiver insuficiente, devolve ao especialista — sem reabrir a validação técnica já aprovada por Vera. **Só depois da dupla aprovação (Vera + Codex) a entrega chega ao Nexus como concluída.**
+- **Codex (Documentação/Catalogação)** é o **portão de documentação**: entra **depois** da aprovação técnica da Vera. Garante que a entrega está documentada, padronizada e catalogada antes de ser considerada verdadeiramente finalizada. Se a documentação estiver insuficiente, devolve ao especialista — sem reabrir a validação técnica já aprovada por Vera. **Só depois da dupla aprovação (Vera + Codex) a entrega segue para implantação.**
+- **Deploy (Release/Implantação)** entra **depois** de Vera + Codex, usando os códigos e documentos já aprovados em `/projects/<nome>/`. **Forge provisiona a infraestrutura; Deploy implanta sobre ela**: atua só em staging e produção, dentro de janela de manutenção, com blue/green para tabelas, dry-run, smoke test pós-deploy e rollback se falhar. **Produção exige duas aprovações a cada deploy: Axis (projeto aplicado) e humana (atividades de subida executadas pelo Deploy).** Hotfix só declarado pelo Nexus e com as mesmas aprovações; um deploy por vez por ambiente; pré-condições incluem runbook de pausa do Flow, liberação do Sentinel para dados em staging, custo do blue/green (Forge) e consumidores mapeados. Só implanta o que já está aprovado e não assume o papel de nenhum outro agente (não escreve código, não altera infraestrutura, não testa nem documenta): defeito volta ao especialista (e a Vera + Codex antes de novo deploy); divergência de infraestrutura volta ao Forge via Nexus. **Só depois de implantada e verificada a entrega chega ao Nexus como concluída.**
 
 ---
 
@@ -168,7 +174,8 @@ flowchart LR
 6. Ao considerar a tarefa pronta, o especialista **envia para Vera validar** — não reporta "concluído" direto ao Nexus.
 7. Vera testa (inclui aderência à convenção de nomenclatura); se reprovar, devolve ao especialista com apontamentos e o ciclo se repete até aprovar tecnicamente.
 8. Com a aprovação técnica da Vera, **Codex verifica e organiza a documentação** (catálogo, dicionário de dados, glossário); se insuficiente, devolve ao especialista (sem reabrir o teste técnico já aprovado).
-9. Só após **Vera + Codex aprovarem**, Nexus recebe a entrega como finalizada, remove bloqueios pendentes e reporta ao stakeholder.
+9. Após **Vera + Codex aprovarem**, o **Deploy** implanta a versão aprovada (dry-run, staging antes de produção, janela de manutenção, blue/green em tabelas, smoke test; produção com aprovação do Axis e humana). Falhou: rollback e devolução. Implantado e verificado: registra o deploy em `docs/deploy/`.
+10. Só então Nexus recebe a entrega como finalizada, remove bloqueios pendentes e reporta ao stakeholder.
 
 ---
 
@@ -285,6 +292,8 @@ flowchart LR
 | Documentação desatualizada, órfã ou conflitante | **Codex** | Especialista dono do artefato, Nexus (se recorrente) |
 | Dúvida sobre onde encontrar um dado/modelo/pipeline existente | **Codex** | — |
 | Definição de termo de negócio (glossário) | **Codex** | Nexus (quando envolve decisão de negócio) |
+| Entrega aprovada por Vera + Codex, pronta para ir ao ar | **Deploy** | Axis (projeto aplicado), humano (atividades de subida), Forge (infra), Nexus |
+| Falha de deploy / necessidade de rollback | **Deploy** | Especialista dono (defeito), Forge (infra), Nexus |
 
 ---
 
