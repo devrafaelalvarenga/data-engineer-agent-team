@@ -10,11 +10,11 @@
    cada projeto de dados novo, um subdiretório por projeto.
 4. Reinicie o Claude Code (necessário na primeira vez que a pasta
    .claude/agents/ é criada) ou abra uma nova sessão no projeto.
-5. Rode `/agents` para confirmar que os 12 subagentes foram carregados.
+5. Rode `/agents` para confirmar que os 13 subagentes foram carregados.
 
 ## Agentes incluídos
 
-scope · nexus · axis · pyxel · schema · lens · forge · sentinel · flow · vera · codex · deploy
+scope · nexus · axis · pyxel · schema · lens · cortex · forge · sentinel · flow · vera · codex · deploy
 
 Veja ARCHITECTURE.md para o papel de cada um e o fluxo de trabalho completo.
 Veja CLAUDE.md para a estrutura do repositório e as regras práticas

@@ -14,6 +14,7 @@ Este documento consolida os agentes criados, suas relações hierárquicas/funci
 | Especialista | **Pyxel** | Python para Dados | Execução — ingestão, transformação e carga em código Python (inclui streaming), testes com pytest |
 | Especialista | **Schema** | SQL, Modelagem e Camada de Consumo (BigQuery) | Execução — modelagem, dbt, queries, tabelas/views de consumo, testes estruturais |
 | Especialista | **Lens** | BI e Painéis | Execução — painéis e métricas na ferramenta de BI (padrão Looker Studio), sobre a camada de consumo do Schema |
+| Especialista | **Cortex** | IA/LLM (RAG e LLMOps) | Execução — chunking, embeddings, busca vetorial no BigQuery, avaliação, Google AI Studio (Gemini API) |
 | Especialista | **Forge** | Infraestrutura e Cloud (GCP) | Execução — provisionamento, IAM, CI/CD, FinOps (custo zero primeiro) |
 | Especialista | **Sentinel** | Qualidade e Governança de Dados | Execução — regras de negócio, freshness, anomalias, política de acesso e LGPD, RCA |
 | Especialista | **Flow** | Orquestração e Pipelines | Execução — Workflows + Scheduler (padrão), Airflow por ADR, runbook de pausa/retomada |
@@ -44,6 +45,7 @@ graph TD
     NEXUS -->|"atribui tarefas<br/>(após gate do Axis)"| PYXEL
     NEXUS -->|"atribui tarefas<br/>(após gate do Axis)"| SCHEMA
     NEXUS -->|"atribui tarefas<br/>(após gate do Axis)"| LENS
+    NEXUS -->|"atribui tarefas<br/>(após gate do Axis)"| CORTEX
     NEXUS -->|"atribui tarefas<br/>(após gate do Axis)"| FORGE
     NEXUS -->|"atribui tarefas<br/>(após gate do Axis)"| SENTINEL
     NEXUS -->|"atribui tarefas<br/>(após gate do Axis)"| FLOW
@@ -51,6 +53,7 @@ graph TD
     AXIS -.->|"define padrões, templates<br/>de pasta e nomenclatura"| PYXEL
     AXIS -.->|"define padrões, templates<br/>de pasta e nomenclatura"| SCHEMA
     AXIS -.->|"define padrões, templates<br/>de pasta e nomenclatura"| LENS
+    AXIS -.->|"define padrões, templates<br/>de pasta e nomenclatura"| CORTEX
     AXIS -.->|"define padrões, templates<br/>de pasta e nomenclatura"| FORGE
     AXIS -.->|"define padrões, templates<br/>de pasta e nomenclatura"| SENTINEL
     AXIS -.->|"define padrões, templates<br/>de pasta e nomenclatura"| FLOW
@@ -58,6 +61,7 @@ graph TD
     PYXEL["🐍 Pyxel<br/>Python para Dados"]
     SCHEMA["🗄️ Schema<br/>SQL e Modelagem"]
     LENS["📊 Lens<br/>BI e Painéis"]
+    CORTEX["🧠 Cortex<br/>IA/LLM (RAG)"]
     FORGE["☁️ Forge<br/>Infra e Cloud"]
     SENTINEL["🛡️ Sentinel<br/>Qualidade e Governança"]
     FLOW["🔄 Flow<br/>Orquestração"]
@@ -72,6 +76,8 @@ graph TD
 
     SCHEMA <-->|testes de modelo| SENTINEL
     SCHEMA -->|"tabelas/views de consumo"| LENS
+    CORTEX <-->|"tabela de vetores"| SCHEMA
+    CORTEX <-->|"política de dados para LLM"| SENTINEL
     SCHEMA <-->|onde os modelos rodam| FORGE
 
     FORGE <-->|infra de execução| FLOW
@@ -80,6 +86,7 @@ graph TD
     PYXEL -->|"entrega concluída"| VERA
     SCHEMA -->|"entrega concluída"| VERA
     LENS -->|"entrega concluída"| VERA
+    CORTEX -->|"entrega concluída"| VERA
     FORGE -->|"entrega concluída"| VERA
     SENTINEL -->|"entrega concluída"| VERA
     FLOW -->|"entrega concluída"| VERA
@@ -87,6 +94,7 @@ graph TD
     VERA -->|"❌ reprova (com apontamentos)"| PYXEL
     VERA -->|"❌ reprova (com apontamentos)"| SCHEMA
     VERA -->|"❌ reprova (com apontamentos)"| LENS
+    VERA -->|"❌ reprova (com apontamentos)"| CORTEX
     VERA -->|"❌ reprova (com apontamentos)"| FORGE
     VERA -->|"❌ reprova (com apontamentos)"| SENTINEL
     VERA -->|"❌ reprova (com apontamentos)"| FLOW
@@ -95,6 +103,7 @@ graph TD
     CODEX -.->|"⚠️ documentação<br/>insuficiente"| PYXEL
     CODEX -.->|"⚠️ documentação<br/>insuficiente"| SCHEMA
     CODEX -.->|"⚠️ documentação<br/>insuficiente"| LENS
+    CODEX -.->|"⚠️ documentação<br/>insuficiente"| CORTEX
     CODEX -.->|"⚠️ documentação<br/>insuficiente"| FORGE
     CODEX -.->|"⚠️ documentação<br/>insuficiente"| SENTINEL
     CODEX -.->|"⚠️ documentação<br/>insuficiente"| FLOW
@@ -116,7 +125,7 @@ graph TD
     class SCOPE desc
     class NEXUS gestor
     class AXIS arq
-    class PYXEL,SCHEMA,LENS,FORGE,SENTINEL,FLOW esp
+    class PYXEL,SCHEMA,LENS,CORTEX,FORGE,SENTINEL,FLOW esp
     class STK ext
     class VERA qa
     class CODEX doc
@@ -137,7 +146,7 @@ graph TD
 - **Scope (Analista de Requisitos)** é a **porta de entrada de projetos novos e ideias vagas**, pensada para stakeholders sem conhecimento técnico. Conduz a entrevista em rodadas sem limite de perguntas, mediadas pela conversa principal de forma interativa (`AskUserQuestion`), pois subagentes não conversam com o usuário no meio da execução e entrega um **brief funcional** que o stakeholder valida antes de seguir. Não decide tecnologia nem arquitetura.
 - **Nexus (Gestor)** é a **porta de entrada de backlog, priorização, status e incidentes**, e o responsável por priorizar, distribuir e cobrar. Projetos novos chegam a ele já com brief validado pelo Scope, que ele analisa e valida antes de planejar. Toda demanda vira tarefa por ele antes de ir a um especialista. **Mas Nexus não distribui nada diretamente** — toda tarefa passa primeiro pelo gate do Axis.
 - **Axis (Arquiteto)** é **gate obrigatório de pré-distribuição para toda tarefa**, rotineira ou estrutural — não só quando há impacto arquitetural óbvio. Ele valida/prepara a estrutura de projeto e a convenção de nomenclatura antes de qualquer tarefa seguir para um especialista. Na maioria dos casos essa checagem é rápida; ele só aprofunda a análise (opções, trade-offs, ADR) quando identifica impacto estrutural real.
-- **Especialistas (Pyxel, Schema, Lens, Forge, Sentinel, Flow)** executam o trabalho técnico dentro do escopo de sua especialidade e **colaboram diretamente entre si** para resolver dependências técnicas pontuais — sem precisar passar pelo Nexus a cada interação, desde que isso não mude prazo, escopo ou prioridade combinados.
+- **Especialistas (Pyxel, Schema, Lens, Cortex, Forge, Sentinel, Flow)** executam o trabalho técnico dentro do escopo de sua especialidade e **colaboram diretamente entre si** para resolver dependências técnicas pontuais — sem precisar passar pelo Nexus a cada interação, desde que isso não mude prazo, escopo ou prioridade combinados.
 - **Vera (Tester/QA)** é o **portão de qualidade técnica**: toda entrega marcada como "concluída" por um especialista vai para ela antes de seguir adiante. Vera aprova ou reprova (devolvendo ao especialista com apontamentos), em ciclo, até a entrega atender aos critérios de aceite e aos padrões de qualidade do time.
 - **Codex (Documentação/Catalogação)** é o **portão de documentação**: entra **depois** da aprovação técnica da Vera. Garante que a entrega está documentada, padronizada e catalogada antes de ser considerada verdadeiramente finalizada. Se a documentação estiver insuficiente, devolve ao especialista — sem reabrir a validação técnica já aprovada por Vera. **Só depois da dupla aprovação (Vera + Codex) a entrega segue para implantação.**
 - **Deploy (Release/Implantação)** entra **depois** de Vera + Codex, usando os códigos e documentos já aprovados em `/projects/<nome>/`. **Forge provisiona a infraestrutura; Deploy implanta sobre ela**: atua só em staging e produção, dentro de janela de manutenção, com blue/green para tabelas, dry-run, smoke test pós-deploy e rollback se falhar. **Produção exige duas aprovações a cada deploy: Axis (projeto aplicado) e humana (atividades de subida executadas pelo Deploy).** Hotfix só declarado pelo Nexus e com as mesmas aprovações; um deploy por vez por ambiente; pré-condições incluem runbook de pausa do Flow, liberação do Sentinel para dados em staging, custo do blue/green (Forge) e consumidores mapeados. Só implanta o que já está aprovado e não assume o papel de nenhum outro agente (não escreve código, não altera infraestrutura, não testa nem documenta): defeito volta ao especialista (e a Vera + Codex antes de novo deploy); divergência de infraestrutura volta ao Forge via Nexus. **Só depois de implantada e verificada a entrega chega ao Nexus como concluída.**

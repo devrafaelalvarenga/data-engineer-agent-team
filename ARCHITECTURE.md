@@ -6,7 +6,7 @@
 
 ## Visão Geral
 
-O time é composto por **12 agentes** organizados em seis camadas funcionais:
+O time é composto por **13 agentes** organizados em seis camadas funcionais:
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -14,7 +14,7 @@ O time é composto por **12 agentes** organizados em seis camadas funcionais:
 │  GESTÃO           Nexus (Gestor/Líder Técnico)            │
 │  ARQUITETURA      Axis (Arquiteto de Dados)                │
 ├─────────────────────────────────────────────────────────┤
-│  EXECUÇÃO   Pyxel · Schema · Lens · Forge · Sentinel · Flow │
+│  EXECUÇÃO   Pyxel · Schema · Lens · Cortex · Forge · Sentinel · Flow │
 ├─────────────────────────────────────────────────────────┤
 │  QUALIDADE        Vera (QA/Tester)                         │
 │  DOCUMENTAÇÃO     Codex (Documentação/Catalogação)          │
@@ -37,12 +37,13 @@ Projetos novos ou ideias vagas entram pelo **Scope**, que entrega um brief funci
 | 4 | **Pyxel** | Python para Dados | Execução | `pyxel.md` |
 | 5 | **Schema** | SQL, Modelagem e Camada de Consumo (BigQuery/GCP) | Execução | `schema.md` |
 | 6 | **Lens** | BI e Painéis (Looker Studio) | Execução | `lens.md` |
-| 7 | **Forge** | Infraestrutura e Cloud | Execução | `forge.md` |
-| 8 | **Sentinel** | Qualidade e Governança de Dados | Execução | `sentinel.md` |
-| 9 | **Flow** | Orquestração e Pipelines | Execução | `flow.md` |
-| 10 | **Vera** | Testadora / QA de Entregas | Qualidade | `vera.md` |
-| 11 | **Codex** | Documentação e Catalogação de Dados | Documentação | `codex.md` |
-| 12 | **Deploy** | Release / Implantação (staging e produção) | Implantação | `deploy.md` |
+| 7 | **Cortex** | IA/LLM: RAG e LLMOps (Google AI Studio) | Execução | `cortex.md` |
+| 8 | **Forge** | Infraestrutura e Cloud | Execução | `forge.md` |
+| 9 | **Sentinel** | Qualidade e Governança de Dados | Execução | `sentinel.md` |
+| 10 | **Flow** | Orquestração e Pipelines | Execução | `flow.md` |
+| 11 | **Vera** | Testadora / QA de Entregas | Qualidade | `vera.md` |
+| 12 | **Codex** | Documentação e Catalogação de Dados | Documentação | `codex.md` |
+| 13 | **Deploy** | Release / Implantação (staging e produção) | Implantação | `deploy.md` |
 
 ---
 
@@ -79,7 +80,7 @@ flowchart TD
     AX -->|"estrutura ok / preparada"| T["Nexus distribui tarefa"]
     AX -->|"impacto estrutural identificado"| ADR["Axis aprofunda:<br/>opções, trade-offs, ADR"]
     ADR --> T
-    T --> E["Especialista executa<br/>(Pyxel/Schema/Lens/Forge/Sentinel/Flow)"]
+    T --> E["Especialista executa<br/>(Pyxel/Schema/Lens/Cortex/Forge/Sentinel/Flow)"]
     E --> V["Vera testa e valida"]
     V -->|reprovado| E
     V -->|aprovado tecnicamente| C["Codex documenta e cataloga"]
@@ -107,6 +108,7 @@ Este fluxo se repete, com variações de entrada, para os quatro cenários docum
 | Código Python (ingestão/transformação/carga) | Pyxel |
 | Modelagem/SQL | Schema |
 | Painel de BI / métricas na ferramenta de BI | Lens |
+| RAG, embeddings, LLM (Google AI Studio) | Cortex |
 | Infraestrutura/custo | Forge |
 | Qualidade/incidente de dado | Sentinel |
 | Orquestração/scheduling | Flow |

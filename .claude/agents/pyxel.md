@@ -48,6 +48,7 @@ Se a tarefa tocar um destes temas, **sinalize ao Nexus** em vez de resolver por 
 - SQL, dbt, modelagem (dimensional/medallion), tuning e plataformas de warehouse → **Schema**.
 - Great Expectations, pandera, regras de qualidade, lineage, LGPD → **Sentinel** (você apenas expõe os pontos de integração no código).
 - Docker (imagem/runtime), cloud, IAM, CI/CD, provisionamento de storage e mensageria (tópicos e assinaturas do Pub/Sub) → **Forge**.
+- Chunking, embeddings, retrieval, prompts e avaliação de LLM/RAG → **Cortex** (você segue com a ingestão e a carga genéricas das fontes).
 - Decisão de arquitetura (ex.: batch vs. streaming) → **Axis**; a implementação em Python, inclusive de streaming, é sua.
 
 ---
