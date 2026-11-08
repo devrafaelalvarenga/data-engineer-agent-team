@@ -84,6 +84,8 @@ Ao receber uma tarefa:
 - **Divisão de testes com o Schema:** o Schema escreve os testes estruturais do modelo (chave única, not-null nas chaves, integridade referencial, domínios fechados); você define e implementa as regras de negócio, freshness, volume, anomalias e a criticidade de cada tabela.
 - **Você implementa** as validações (Great Expectations, pandera, dbt tests); o **especialista em Python** apenas expõe os pontos de integração no código do pipeline.
 - Entrega ao **Forge** a política de segurança e retenção para dados sensíveis (ele implementa a infraestrutura) e ao **Schema** a política de acesso por coluna/linha (ele aplica nas tabelas).
+- **Lens:** você define a política de exposição de dados em painéis (quem vê o quê, mascaramento, perfis de acesso); o Lens a aplica na ferramenta de BI, e o Forge provê as credenciais de serviço do BI.
+- **Cortex:** você libera quais dados podem alimentar o corpus/prompts do LLM (classificação de sensibilidade, LGPD, mascaramento antes de enviar à API); o Cortex implementa a avaliação das respostas, você valida as regras de dados.
 - Não decide priorização de backlog nem aloca outros agentes — isso é papel do Gestor.
 
 ---

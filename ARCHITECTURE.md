@@ -6,7 +6,7 @@
 
 ## Visão Geral
 
-O time é composto por **13 agentes** organizados em seis camadas funcionais:
+O time é composto por **13 agentes** organizados em sete camadas funcionais:
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -59,8 +59,8 @@ Projetos novos ou ideias vagas entram pelo **Scope**, que entrega um brief funci
 7. **Reprovação recorrente é sinal de processo** — tanto Vera quanto Codex escalam ao Nexus quando um padrão de erro/lacuna se repete, em vez de tratar caso a caso indefinidamente.
 8. **Axis define o padrão de estrutura de projetos (scaffolding); especialistas aplicam** — todo projeto novo (pipeline, modelo dbt, módulo de infraestrutura, DAG) segue um template de pastas/layout mantido pelo Axis.
 9. **Axis é gate obrigatório de pré-distribuição, em toda tarefa** — rotineira ou estrutural. Nexus não distribui nada sem essa validação; para a maioria das tarefas o gate é rápido (confirma estrutura já correta), só se aprofunda quando identifica impacto real. Isso não é opcional nem proporcional à complexidade percebida da tarefa.
-11. **Deploy é a etapa após o duplo gate; Forge provisiona, Deploy implanta** — Deploy só implanta a versão exata aprovada por Vera e Codex, atua só em staging e produção, em janela de manutenção, com blue/green para tabelas, smoke test pós-deploy e rollback se falhar. **Produção exige duas aprovações a cada deploy: Axis (projeto aplicado) e humana (atividades de subida executadas pelo Deploy).** Hotfix só com declaração do Nexus e as mesmas aprovações; um deploy por vez por ambiente. Deploy só implanta o que já está aprovado e não assume o papel de nenhum outro agente (não cria nem altera infraestrutura, código, testes ou documentação): lacuna ou divergência volta ao dono via Nexus.
 10. **Convenção de idioma é padrão de todo o time** — identificadores de código (variáveis, funções, tabelas, colunas, recursos de infraestrutura, DAGs) sempre em **inglês**; comentários, docstrings e toda documentação sempre em **português**. Definida por Axis, aplicada por todos os especialistas, verificada por Vera.
+11. **Deploy é a etapa após o duplo gate; Forge provisiona, Deploy implanta** — Deploy só implanta a versão exata aprovada por Vera e Codex, atua só em staging e produção, em janela de manutenção, com blue/green para tabelas, smoke test pós-deploy e rollback se falhar. **Produção exige duas aprovações a cada deploy: Axis (projeto aplicado) e humana (atividades de subida executadas pelo Deploy).** Hotfix só com declaração do Nexus e as mesmas aprovações; um deploy por vez por ambiente. Deploy só implanta o que já está aprovado e não assume o papel de nenhum outro agente (não cria nem altera infraestrutura, código, testes ou documentação): lacuna ou divergência volta ao dono via Nexus.
 
 ---
 
@@ -114,7 +114,7 @@ Este fluxo se repete, com variações de entrada, para os quatro cenários docum
 | Orquestração/scheduling | Flow |
 | Validar entrega concluída | Vera |
 | Documentar/catalogar/consultar o catálogo | Codex |
-| Implantar entrega aprovada (dev/staging/produção) | **Deploy** |
+| Implantar entrega aprovada (staging/produção) | **Deploy** |
 
 > Matriz completa e fluxos detalhados (com diagramas por cenário) em `organograma-fluxo-decisao-time-dados.md`.
 

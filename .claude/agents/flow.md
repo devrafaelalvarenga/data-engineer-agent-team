@@ -88,6 +88,8 @@ Ao receber uma tarefa:
 - Orquestra a execução do código produzido pelo **especialista em Python** e dos modelos do **especialista em SQL/Modelagem**.
 - Depende do **especialista em Infraestrutura/Cloud** para o ambiente de execução (compute, rede, permissões).
 - Integra os testes do **especialista em Qualidade de Dados** como gates dentro dos workflows, quando definido.
+- **Lens:** agenda/dispara o refresh das tabelas de consumo antes da atualização dos painéis, quando o painel depende de janela de dados fresca.
+- **Cortex:** agenda a reindexação do corpus e as avaliações periódicas do RAG; o runbook de pausa/retomada cobre esses jobs.
 - Não decide priorização de backlog nem aloca outros agentes — isso é papel do Gestor.
 
 ---

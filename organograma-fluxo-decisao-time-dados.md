@@ -186,7 +186,7 @@ flowchart LR
 1. Stakeholder leva a ideia ao **Scope**, que a transforma em brief funcional (em rodadas) e obtém a **validação do stakeholder**. Só então o brief (`VALIDADO`) segue ao **Nexus**, que o analisa e faz a sua validação; sem questionamento pendente, quebra em tarefas. Com questionamento, devolve ao Scope. (Demandas de backlog, status e incidentes continuam entrando direto pelo Nexus.)
 2. **Toda tarefa passa pelo gate do Axis** antes de qualquer distribuição — sem exceção para tarefas que pareçam rotineiras. Axis valida/prepara a estrutura de projeto (colocando o brief em `docs/brief.md`), a convenção de nomenclatura (identificadores em inglês, comentários/docs em português), e valida a **viabilidade técnica do brief**. **Enquanto houver dúvida de informação** (fato que só o stakeholder ou terceiros sabem), o brief é tratado como inviável: o Axis não libera nenhuma fase e devolve ao Scope, que abre novo ciclo de esclarecimento em linguagem de negócio. Decisões de desenho (stack, grão, pseudonimização) são do Axis, via ADR, e não bloqueiam.
 3. Se o gate identificar impacto estrutural real (nova fonte de dados, novo domínio, nova tecnologia), Axis aprofunda a análise (opções, trade-offs, ADR) antes de liberar. Na maioria dos casos, o gate é rápido e não identifica nada disso.
-4. Nexus distribui tarefas aos especialistas relevantes (ex.: Schema modela, Pyxel constrói pipeline, Flow orquestra).
+4. Nexus distribui tarefas aos especialistas relevantes (ex.: Schema modela, Pyxel constrói pipeline, Flow orquestra, Lens constrói o painel, Cortex implementa o RAG).
 5. Especialistas colaboram entre si nas dependências técnicas (ex.: Pyxel usa o schema definido por Schema).
 6. Ao considerar a tarefa pronta, o especialista **envia para Vera validar** — não reporta "concluído" direto ao Nexus.
 7. Vera testa (inclui aderência à convenção de nomenclatura); se reprovar, devolve ao especialista com apontamentos e o ciclo se repete até aprovar tecnicamente.
@@ -206,10 +206,14 @@ flowchart LR
     C -->|Modelo/SQL| E["Sentinel + Schema"]
     C -->|Falha de execução| F["Sentinel + Flow"]
     C -->|Infra/acesso| G["Sentinel + Forge"]
+    C -->|Painel/métrica| L["Sentinel + Lens"]
+    C -->|RAG/LLM| K["Sentinel + Cortex"]
     D --> AX["Axis: gate rápido<br/>(estrutura/nomenclatura da correção)"]
     E --> AX
     F --> AX
     G --> AX
+    L --> AX
+    K --> AX
     AX --> H["Correção implementada"]
     H --> V["Vera testa a correção<br/>(inclui causa raiz)"]
     V --> R{"Aprovado?"}
@@ -220,7 +224,7 @@ flowchart LR
 
 1. Incidente chega a **Nexus** (via stakeholder ou monitoramento).
 2. Nexus aciona **Sentinel** para investigação e diagnóstico (causa raiz baseada em evidência).
-3. Sentinel identifica a origem e colabora diretamente com o especialista responsável (Pyxel, Schema, Flow ou Forge, conforme o caso).
+3. Sentinel identifica a origem e colabora diretamente com o especialista responsável (Pyxel, Schema, Flow, Forge, Lens ou Cortex, conforme o caso).
 4. **Antes da correção começar, passa pelo gate do Axis** — mesmo sendo uma correção pontual, é uma tarefa como outra qualquer. Normalmente é uma checagem rápida (a estrutura já existe, só precisa ser corrigida).
 5. Correção é implementada pelo especialista técnico.
 6. **Vera testa a correção** — não só se o sintoma sumiu, mas se a causa raiz apontada por Sentinel foi de fato tratada e se nada mais foi quebrado. Se reprovar, devolve para nova correção.
@@ -297,9 +301,11 @@ flowchart LR
 | Dúvida sobre prioridade/prazo | **Nexus** | — |
 | Nova arquitetura / mudança de stack | **Axis** | Nexus, Forge, Schema |
 | Pipeline com bug ou lento | **Pyxel** | Flow (execução), Forge (infra) |
+| Painel de BI / métricas na ferramenta de BI | **Lens** | Schema (tabelas de consumo), Sentinel (acesso), Forge (credenciais) |
+| RAG, embeddings, LLM (Google AI Studio) | **Cortex** | Schema, Sentinel (dados liberados), Flow (reindexação), Forge (chave/custo) |
 | Modelo de dados novo ou incorreto | **Schema** | Sentinel (testes), Axis (gate + se mudar padrão) |
 | Provisionamento de recursos / custo alto | **Forge** | Axis (gate + se mudar arquitetura) |
-| Dado incorreto / incidente de confiança | **Sentinel** | Pyxel, Schema, Flow (conforme causa) |
+| Dado incorreto / incidente de confiança | **Sentinel** | Pyxel, Schema, Flow, Lens, Cortex (conforme causa) |
 | Pipeline não rodou / falhou no horário | **Flow** | Forge (infra), Pyxel (lógica) |
 | Dúvida sobre padrão a seguir / nomenclatura | **Axis** | — |
 | Feedback de performance de pessoa/agente | **Nexus** | — |

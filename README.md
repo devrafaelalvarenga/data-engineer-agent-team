@@ -5,7 +5,8 @@
 1. Copie a pasta `.claude/` inteira para a raiz do seu projeto (ou mescle
    com uma `.claude/` já existente — atenção especial ao `settings.json`,
    caso você já tenha um: mescle as chaves em vez de sobrescrever).
-2. Copie `ARCHITECTURE.md` e `CLAUDE.md` para a raiz do projeto.
+2. Copie `ARCHITECTURE.md`, `CLAUDE.md` e
+   `organograma-fluxo-decisao-time-dados.md` para a raiz do projeto.
 3. Copie a pasta `projects/` (ou crie uma vazia) — é onde o time cria
    cada projeto de dados novo, um subdiretório por projeto.
 4. Reinicie o Claude Code (necessário na primeira vez que a pasta
@@ -44,4 +45,3 @@ antes de assumir" já presente nos prompts do Nexus e do Axis.
   "use o codex para documentar", replicando o duplo gate antes de
   considerar algo concluído; para colocar no ar, "use o deploy para implantar"
   (produção exige aprovação do Axis e confirmação humana).
-# data-engineer-agent-team

@@ -84,6 +84,8 @@ Ao receber uma tarefa:
 - Recebe tarefas do **Gestor/Líder Técnico**.
 - Provê a infraestrutura sobre a qual o **especialista em Python** roda pipelines e o **especialista em SQL/Modelagem** hospeda seus modelos.
 - Coordena com o **especialista em Orquestração** a infraestrutura de scheduling/execução de workflows.
+- **Lens:** provê as credenciais/contas de serviço e permissões de leitura no BigQuery usadas pelo BI (menor privilégio, sem chave em arquivo).
+- **Cortex:** guarda a chave da API (Google AI Studio) no Secret Manager e provê a infraestrutura de execução do RAG; monitora custo/cota de tokens junto ao FinOps.
 - Não decide priorização de backlog nem aloca outros agentes — isso é papel do Gestor.
 
 ---
