@@ -192,7 +192,7 @@ flowchart LR
 7. Vera testa (inclui aderência à convenção de nomenclatura); se reprovar, devolve ao especialista com apontamentos e o ciclo se repete até aprovar tecnicamente.
 8. Com a aprovação técnica da Vera, **Codex verifica e organiza a documentação** (catálogo, dicionário de dados, glossário); se insuficiente, devolve ao especialista (sem reabrir o teste técnico já aprovado).
 9. Após **Vera + Codex aprovarem**, o **Deploy** implanta a versão aprovada (dry-run, staging antes de produção, janela de manutenção, blue/green em tabelas, smoke test; produção com aprovação do Axis e humana). Falhou: rollback e devolução. Implantado e verificado: registra o deploy em `docs/deploy/`.
-10. Só então Nexus recebe a entrega como finalizada, remove bloqueios pendentes e reporta ao stakeholder.
+10. Só então Nexus recebe a entrega como finalizada, remove bloqueios pendentes e reporta ao stakeholder. A cada transição de gate, o Nexus devolve o `docs/status.md` atualizado e a conversa principal o grava.
 
 ---
 

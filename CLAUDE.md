@@ -85,6 +85,7 @@ Cada invocação de subagente é **isolada**: ele não lembra das anteriores e s
 
 - **Scope**: ideia bruta + fatos e respostas de **todas** as rodadas anteriores + o **texto integral do brief anterior** (itens 1 a 11, com status) quando houver. Sem o brief, o Scope não consegue atualizá-lo e se recusa a reconstruí-lo (e deve se recusar).
 - **Nexus, Axis, especialistas, Vera, Codex e Deploy**: o brief `VALIDADO` completo (ou o caminho de `projects/<nome>/docs/brief.md`, quando já gravado), o plano de tarefas do Nexus, as decisões do Axis (ADRs, estrutura de pastas, quem atua), o escopo exato da tarefa e as **aprovações já obtidas** (Vera, Codex, Axis, humana) com a versão a que se referem.
+- **Registro de evolução**: passe ao Nexus o caminho de `projects/<nome>/docs/status.md` a cada invocação. O Nexus não grava arquivos: ele devolve o texto integral atualizado em um bloco de código, e a conversa principal o **grava em `status.md` a cada transição de gate** (brief validado, gate do Axis, Vera, Codex, deploy, conclusão). Informe ao Nexus os resultados de Vera, Codex, Axis, Deploy e as aprovações humanas, pois ele só registra o que recebe.
 - Cole os textos integrais; não escreva "o brief da rodada anterior". O que já está em disco pode ser passado por caminho.
 
 ## Ao trabalhar fora dos subagentes (nesta conversa principal)
